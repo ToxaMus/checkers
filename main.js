@@ -8,8 +8,8 @@ addCell(cells)
 const divs = Array.from(board.children)
 
 const figure = new Figure(cells, divs)
-figure.addChecker()
-//figure.testStain()
+// figure.addChecker()
+figure.testStain()
 
 const control = new Control(cells, divs)
 control.keyboard()

@@ -1,35 +1,31 @@
-class Checker extends Move {
-    constructor(arrayCells, arrayDivs) {   
-        super(arrayCells, arrayDivs) 
+class Checker extends GeneralActons {
+    constructor(arrayCells, arrayDivs) {
+        super(arrayDivs)
         this._arrayCells = arrayCells
         this._arrayDivs = arrayDivs
     }
 
-    checker(elem) {
+    checker(elem, colorMoveFigure) {
         const enemys = this.findEat(elem)
         const moves = this.avaibleMovesForEat(elem, enemys)
         this.filterEnemyFigure(enemys, moves)
 
-        this.moveFigureChecker(enemys, moves, elem)
+        this.moveFigureChecker(enemys, moves, elem, colorMoveFigure)
 
-    }
+    }   
 
-    isEnemy(array) {
-        if (array.length != 0) {
-            return true
+    moveFigureChecker(enem, move, el, color) {
+        if (el.figure == null) {
+            this.moveChecker(el)
         } else {
-            return false
-        }
-    }
-
-    moveFigureChecker(enem, move, el) {
-        if (this.isEnemy(enem)) {
-            this.avaibleEat(move, enem)
-        } else {
-            if (el.color == "white" && this.move) {
-                this.avaibleMoveWhite(el)
-            } else if (el.color == "black" && !this.move) {
-                this.avaibleMoveBlack(el)
+            if (super.isEnemy(enem)) {
+                super.avaibleEat(move, enem)
+            } else {
+                if (el.color == "white" && color) {
+                    this.avaibleMoveWhite(el)
+                } else if (el.color == "black" && !color) {
+                    this.avaibleMoveBlack(el)
+                }
             }
         }
     }
@@ -85,60 +81,25 @@ class Checker extends Move {
             super.colorMoves(div)
         }
     }
-   
-    moveChecker(cellElem, divElem) {
-        if (divElem.style.backgroundColor == "blue" && divElem.style.border == '4px solid orange') {
-            const oldDiv = this._arrayDivs.find(each => each.style.backgroundColor == 'green')
 
-            const figure = oldDiv.firstChild.cloneNode(false)
-            divElem.appendChild(figure)
-
-            super.deleteFigure(oldDiv)
-
-            const coord = oldDiv.id.split(" ")
-            coord.map(each => parseInt(each))
-
-            const oldCell = this._arrayCells.find(each => each._x == coord[0] && each._y == coord[1])
-
-            this.deleteEatenFigure(oldCell, cellElem)
-            cellElem.figure = oldCell.figure
-            cellElem.color = oldCell.color
-
-            oldCell.figure = null
-            oldCell.color = null
-
-            super.changeOfСourse(oldCell, cellElem)
-        }
-    }
-
-    avaibleEat(cells, arr) {
-        cells.forEach(each => {
-            if (each.figure == null) {
-                const div = this._arrayDivs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
-                div.style.background = "blue"
-            }
-        })
-
-        arr.forEach(each => {
-            const div = this._arrayDivs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
-            div.style.background = "red"
-        })
+    moveChecker(cellElem) {
+        const oldEl = super.findOldCell(cellElem, this._arrayCells)
+        this.deleteEatenFigure(oldEl, cellElem)
+        
+        super.newPositionFigure(cellElem, oldEl)
     }
 
     avaibleMovesForEat(el, arr) {
         const cells = []
 
         arr.forEach(each => {
-
             if (each._x + 1 == el._x && each._y + 1 == el._y && each._x - 1 >= 0 && each._y - 1 >= 0) {
                 cells.push(this._arrayCells.find(cell => cell._x == each._x - 1 && cell._y == each._y - 1))
             } else if (each._x + 1 == el._x && each._y - 1 == el._y && each._x - 1 >= 0 && each._y + 1 <= 7) {
                 cells.push(this._arrayCells.find(cell => cell._x == each._x - 1 && cell._y == each._y + 1))
             } else if (each._x - 1 == el._x && each._y + 1 == el._y && each._x + 1 <= 7 && each._y - 1 >= 0) {
-
                 cells.push(this._arrayCells.find(cell => cell._x == each._x + 1 && cell._y == each._y - 1))
             } else if (each._x - 1 == el._x && each._y - 1 == el._y && each._x + 1 <= 7 && each._y + 1 <= 7) {
-
                 cells.push(this._arrayCells.find(cell => cell._x == each._x + 1 && cell._y == each._y + 1))
             } else {
                 arr.splice(arr.indexOf(each))
@@ -167,14 +128,7 @@ class Checker extends Move {
             array.push(this._arrayCells.find(each => each._x == el._x + 1 && each._y == el._y - 1));
         }
 
-        const arrCells = array.map(each => {
-            if (each.figure != null && each.color != el.color) {
-                return each
-            }
-        })
-            .filter(each => each != undefined)
-
-        return arrCells
+        return super.filterArrayMovesEat(array, el)
     }
 
 
@@ -195,7 +149,6 @@ class Checker extends Move {
             }
         })
     }
-
 
     deleteEatenFigure(oldCell, newCell) {
         let x = newCell._x - oldCell._x
@@ -219,9 +172,8 @@ class Checker extends Move {
             clearCell.color = null
 
             const div = this._arrayDivs.find(each => each.id == `${clearCell._x.toString()} ${clearCell._y.toString()}`)
-            this.deleteChecker(div)
+            super.deleteFigure(div)
 
         }
     }
-
 }

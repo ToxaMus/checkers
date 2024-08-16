@@ -1,23 +1,20 @@
-class Move {
+class Move extends GeneralActons {
     move = true
+    oldCell
 
     constructor(arrayCells, arrayDivs) {
+        super(arrayDivs)
+        this._checker = new Checker(arrayCells, arrayDivs)
+        this._stain = new Stain(arrayCells, arrayDivs)
         this._arrayCells = arrayCells
         this._arrayDivs = arrayDivs
     }
 
-    checker = new Checker(this._arrayCells, this._arrayDivs)
 
     enter(elCell, elDiv) {
-        this.moveChecker(elCell, elDiv)
-        this.returnColor()
+        this.checkColorMove(elCell, elDiv)
+        super.returnColor()
         this.marker(elCell, elDiv)
-    }
-
-    colorMoves(elDiv) {
-        if (!elDiv.firstChild)
-            elDiv.style.backgroundColor = "blue"
-
     }
 
     marker(newCell, newDiv) {
@@ -29,42 +26,47 @@ class Move {
     checkColorMove(cell, div) {
         if ((cell.color == "white" && this.move) || (cell.color == "black" && !this.move)) {
             div.style.backgroundColor = 'green'
-            
-            if (cell.figure == "checker") {
-                this.checker.checker(cell)
+            this.oldCell = cell
+
+            if (this.oldCell.figure == "checker") {
+                this._checker.checker(cell, this.move)
+            } else {
+                this._stain.stain(cell)
             }
+
+        } else if (div.style.backgroundColor == 'blue') {
+            if (this.oldCell.figure == "checker") {
+                this._checker.checker(cell, this.move)
+            
+            } else {
+                this._stain.moveStain(cell)
+            }
+            
+            this.changeOfСourse(cell)
         }
     }
-
-    deleteFigure(el) {
-        el.removeChild(el.firstChild);
-    }
-
-    returnColor() {
-        this._arrayDivs.forEach(each => {
-            if (each.classList.contains("cellBlack")) {
-                each.style.background = "#808080"
-            }
-        })
-    }
-
-
-    changeOfСourse(oldCell, newCell) {
-        let x = newCell._x - oldCell._x
+    
+    checker(el) {
+        let x = el._x - this.oldCell._x
 
         if (Math.abs(x) == 1) {
             this.move = !this.move
         } else {
-            const enemys = this.findEat(newCell)
-            const moves = this.avaibleMovesForEat(newCell, enemys)
-            this.filterEnemyFigure(enemys, moves)
+            const enemys = this._checker.findEat(el)
+            const moves = this._checker.avaibleMovesForEat(el, enemys)
+            this._checker.filterEnemyFigure(enemys, moves)
 
-            if (!this.isEnemy(moves)) {
+            if (!this._checker.isEnemy(enemys)) {
                 this.move = !this.move
+
             }
-
         }
-
-        this.returnColor()
     }
-}
+
+    changeOfСourse(newCell) {
+        if (newCell.figure == "checker") {
+            this.checker(newCell)
+        }
+            super.returnColor()
+    }
+} 

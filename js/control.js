@@ -1,5 +1,4 @@
 class Control {
-
     constructor(arrayCells, arrayDivs) {
         this._arrayCells = arrayCells
         this._arrayDivs = arrayDivs
