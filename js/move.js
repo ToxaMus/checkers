@@ -37,15 +37,15 @@ class Move extends GeneralActons {
         } else if (div.style.backgroundColor == 'blue') {
             if (this.oldCell.figure == "checker") {
                 this._checker.checker(cell, this.move)
-            
+
             } else {
                 this._stain.moveStain(cell)
             }
-            
+
             this.changeOfСourse(cell)
         }
     }
-    
+
     checker(el) {
         let x = el._x - this.oldCell._x
 
@@ -63,10 +63,47 @@ class Move extends GeneralActons {
         }
     }
 
+    makeNewStain(cell) {
+        if ((cell._x == 0 && cell.color == 'white') || (cell._x == 7 && cell.color == 'black')) {
+            cell.figure = "stain"            
+
+            const div = this._arrayDivs.find(el => el.id == `${cell._x.toString()} ${cell._y.toString()}`)
+            const text = document.createElement('p')
+            text.innerHTML = 'W'
+            text.classList.add('stain-text')
+
+            if (cell.color == 'black') {
+                text.style.color = 'white'
+            }
+
+            const figure = div.firstElementChild
+
+            figure.appendChild(text)
+        }
+    }
+
+    stain(el) {
+        const enemys = this._stain.findEnemys(this.oldCell)
+        this._stain.filterEnemys(enemys, this.oldCell)
+
+        if (!super.isEnemy(enemys)) {
+            this.move = !this.move
+        } else {
+            const figures = this._stain.findEnemys(el)
+            this._stain.filterEnemys(figures, el)
+ 
+            if (!this.isEnemy(figures))
+                this.move = !this.move
+        }
+    }
+
     changeOfСourse(newCell) {
         if (newCell.figure == "checker") {
             this.checker(newCell)
+            this.makeNewStain(newCell)
+        } else {
+            this.stain(newCell)
         }
-            super.returnColor()
+        super.returnColor()
     }
 } 

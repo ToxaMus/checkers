@@ -72,13 +72,13 @@ class GeneralActons {
     avaibleEat(cells, arr) {
         cells.forEach(each => {
             if (each.figure == null) {
-                const div = this._arrayDivs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
+                const div = this._divs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
                 div.style.background = "blue"
             }
         })
 
         arr.forEach(each => {
-            const div = this._arrayDivs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
+            const div = this._divs.find(el => el.id == `${(each._x).toString()} ${(each._y).toString()}`)
             div.style.background = "red"
         })
     }
